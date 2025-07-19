@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NetApp FAS8300 Interactive Guide</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Cool Neutrals -->
+    <!-- Application Structure Plan: The application is designed as a single-page, tabbed dashboard. The structure includes a main navigation bar to jump between key sections: Overview, Hardware, Software, Setup, and Troubleshooting. This thematic organization allows users to quickly access the information they need, whether it's a high-level summary or a specific technical detail. The flow encourages exploration, starting from a general overview and allowing users to drill down into specific components, step-by-step guides, and problem-solving scenarios. This is more intuitive than a linear document, as users can navigate based on their immediate task or interest. -->
+    <!-- Visualization & Content Choices: 
+        - Report Info: FAS8300 protocol support. -> Goal: Inform on usage mix. -> Viz: Doughnut Chart (Chart.js) -> Interaction: Hover to see details. -> Justification: Quickly shows the multi-protocol nature of the system.
+        - Report Info: Hardware components. -> Goal: Organize and detail complex hardware. -> Viz: Interactive Tabbed Grid (HTML/CSS/JS). -> Interaction: Click tabs to reveal component details. -> Justification: Breaks down complex info into digestible, user-selectable chunks.
+        - Report Info: Software features. -> Goal: Organize features. -> Viz: Interactive dropdown with diagrams (HTML/CSS/JS). -> Interaction: Select from dropdown to view corresponding flowchart. -> Justification: Replaces static cards with a more engaging, visual, and interactive way to explore complex software concepts.
+        - Report Info: Setup process. -> Goal: Guide users sequentially. -> Viz: HTML/CSS Flowchart. -> Interaction: Visual path following. -> Justification: More engaging and intuitive for a process-oriented task than a simple list.
+        - Report Info: Common errors. -> Goal: Provide quick solutions. -> Viz: Searchable Accordion & Simple Flowchart (HTML/CSS/JS). -> Interaction: Click to expand, type to filter, follow visual logic. -> Justification: Excellent for FAQ-style content, the search filter provides immediate access to solutions, and the flowchart guides decision-making.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+            color: #1e293b;
+        }
+        .nav-link {
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+        }
+        .nav-link.active, .nav-link:hover {
+            color: #2563eb;
+            border-bottom-color: #2563eb;
+        }
+        .content-section {
+            display: none;
+        }
+        .content-section.active {
+            display: block;
+        }
+        .tab-button {
+            transition: all 0.2s ease-in-out;
+        }
+        .tab-button.active {
+            background-color: #3b82f6;
+            color: white;
+        }
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 400px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 350px;
+        }
+         @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+        .flow-arrow {
+            color: #94a3b8;
+            font-size: 2rem;
+            line-height: 1;
+        }
+    </style>
+</head>
+<body class="bg-slate-50">
+
+    <header class="bg-white/80 backdrop-blur-lg shadow-sm sticky top-0 z-50">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <h1 class="text-xl md:text-2xl font-bold text-slate-800">NetApp FAS8300 Interactive Guide</h1>
+                <nav class="hidden md:flex space-x-8">
+                    <a class="nav-link active" data-target="overview">Overview</a>
+                    <a class="nav-link" data-target="hardware">Hardware</a>
+                    <a class="nav-link" data-target="software">Software</a>
+                    <a class="nav-link" data-target="setup">Setup</a>
+                    <a class="nav-link" data-target="troubleshooting">Troubleshooting</a>
+                </nav>
+                <div class="md:hidden">
+                    <select id="mobile-nav" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+                        <option value="overview">Overview</option>
+                        <option value="hardware">Hardware</option>
+                        <option value="software">Software</option>
+                        <option value="setup">Setup</option>
+                        <option value="troubleshooting">Troubleshooting</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="container mx-auto p-4 sm:p-6 lg:p-8">
+        
+        <section id="overview" class="content-section active">
+            <div class="text-center mb-8">
+                <h2 class="text-3xl font-bold text-slate-900 mb-2">System Overview</h2>
+                <p class="text-lg text-slate-600 max-w-3xl mx-auto">This interactive guide, reflecting the analysis of Ankit Kumar based on his understanding of the machine, provides an introduction to the NetApp FAS8300, a powerful and versatile unified storage system designed for high performance and reliability.</p>
+            </div>
+            <div class="grid md:grid-cols-2 gap-8 items-center">
+                <div class="bg-white p-6 rounded-lg shadow">
+                    <h3 class="font-semibold text-xl mb-4 text-slate-800">Key Characteristics</h3>
+                    <ul class="space-y-3 text-slate-600">
+                        <li class="flex items-start"><span class="text-blue-500 mr-3 mt-1">&#10004;</span><strong>Unified Architecture:</strong> Natively supports SAN (FC, iSCSI) and NAS (NFS, SMB/CIFS) protocols.</li>
+                        <li class="flex items-start"><span class="text-blue-500 mr-3 mt-1">&#10004;</span><strong>High Performance:</strong> Engineered with multi-core CPUs and high-speed memory for low-latency response.</li>
+                        <li class="flex items-start"><span class="text-blue-500 mr-3 mt-1">&#10004;</span><strong>Scalability:</strong> Offers seamless non-disruptive scaling of capacity and performance.</li>
+                         <li class="flex items-start"><span class="text-blue-500 mr-3 mt-1">&#10004;</span><strong>Cloud Integration:</strong> Natively integrates with major public clouds for a seamless hybrid cloud data fabric.</li>
+                    </ul>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow">
+                    <h3 class="font-semibold text-xl mb-4 text-center text-slate-800">Typical Protocol Distribution</h3>
+                    <p class="text-center text-sm text-slate-500 mb-4">The FAS8300's unified nature allows a flexible mix of data protocols. Hover over sections for details.</p>
+                    <div class="chart-container">
+                        <canvas id="protocolChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="hardware" class="content-section">
+            <div class="text-center mb-8">
+                <h2 class="text-3xl font-bold text-slate-900 mb-2">Hardware Deep Dive</h2>
+                <p class="text-lg text-slate-600 max-w-3xl mx-auto">Explore the core physical components and architecture of the FAS8300 system.</p>
+            </div>
+            
+            <div class="bg-white p-6 rounded-lg shadow mb-8">
+                <h3 class="text-2xl font-bold text-slate-800 mb-4 text-center">High-Availability (HA) Architecture</h3>
+                <div class="flex flex-col items-center">
+                    <div class="font-semibold text-slate-600 mb-2">Client & Application Network</div>
+                    <div class="w-px h-4 bg-slate-400"></div>
+                    <div class="flex gap-4">
+                        <div class="w-px h-4 bg-slate-400"></div>
+                        <div class="w-px h-4 bg-slate-400"></div>
+                    </div>
+                    <div class="w-full flex justify-center gap-8">
+                        <div class="border-2 border-blue-500 bg-blue-50 rounded-lg p-4 text-center w-1/3">
+                            <h4 class="font-bold text-blue-800">Controller A</h4>
+                        </div>
+                        <div class="border-2 border-green-500 bg-green-50 rounded-lg p-4 text-center w-1/3">
+                            <h4 class="font-bold text-green-800">Controller B</h4>
+                        </div>
+                    </div>
+                    <div class="w-full flex justify-center items-center my-2 px-16">
+                        <div class="h-px bg-slate-400 flex-grow"></div>
+                        <div class="text-sm font-semibold text-slate-500 mx-4">HA Interconnect</div>
+                        <div class="h-px bg-slate-400 flex-grow"></div>
+                    </div>
+                    <div class="flex gap-4">
+                        <div class="w-px h-4 bg-slate-400"></div>
+                        <div class="w-px h-4 bg-slate-400"></div>
+                    </div>
+                    <div class="w-full h-px bg-slate-400"></div>
+                    <div class="w-px h-4 bg-slate-400 self-center"></div>
+                    <div class="border-2 border-dashed border-slate-400 bg-slate-50 rounded-lg p-4 text-center w-2/3">
+                        <h4 class="font-bold text-slate-800">Shared Disk Shelves (SAS Connection)</h4>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex flex-col md:flex-row gap-8">
+                <div class="md:w-1/4">
+                    <div id="hardware-tabs" class="flex md:flex-col gap-2">
+                        <button class="tab-button w-full text-left p-3 rounded-md bg-white shadow-sm active" data-target="controller">Controller Chassis</button>
+                        <button class="tab-button w-full text-left p-3 rounded-md bg-white shadow-sm" data-target="io-modules">Connectivity Ports</button>
+                        <button class="tab-button w-full text-left p-3 rounded-md bg-white shadow-sm" data-target="psu">Power & Capacity</button>
+                        <button class="tab-button w-full text-left p-3 rounded-md bg-white shadow-sm" data-target="shelves">Disk Shelves</button>
+                    </div>
+                </div>
+                <div class="md:w-3/4">
+                    <div id="hardware-content" class="bg-white p-6 rounded-lg shadow min-h-[300px]">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="software" class="content-section">
+            <div class="text-center mb-8">
+                <h2 class="text-3xl font-bold text-slate-900 mb-2">Software Ecosystem: ONTAP</h2>
+                <p class="text-lg text-slate-600 max-w-3xl mx-auto">The FAS8300 is powered by NetApp ONTAP. Explore its core features by selecting from the dropdown below to see a visual representation of how each technology works.</p>
+            </div>
+            <div class="max-w-4xl mx-auto bg-white p-6 rounded-lg shadow">
+                <div class="mb-4">
+                    <label for="software-feature-select" class="block text-sm font-medium text-slate-700 mb-2">Select a feature to visualize:</label>
+                    <select id="software-feature-select" class="w-full p-2 border border-slate-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                        <option value="snapshots">Snapshots</option>
+                        <option value="flexclone">FlexClone</option>
+                        <option value="snapmirror">SnapMirror</option>
+                        <option value="efficiency">Storage Efficiency</option>
+                        <option value="fabricpool">FabricPool</option>
+                    </select>
+                </div>
+                <div id="software-diagram-container" class="mt-6 min-h-[350px] border-t border-slate-200 pt-6 flex items-center justify-center">
+                    <!-- Diagram will be injected here by JS -->
+                </div>
+            </div>
+        </section>
+
+        <section id="setup" class="content-section">
+            <div class="text-center mb-8">
+                <h2 class="text-3xl font-bold text-slate-900 mb-2">Initial Setup Flowchart</h2>
+                <p class="text-lg text-slate-600 max-w-3xl mx-auto">A visual guide to the initial hardware and software configuration of your FAS8300 system.</p>
+            </div>
+            <div class="flex flex-col md:flex-row items-center justify-center gap-4 md:gap-0">
+                <div class="bg-white border-l-4 border-blue-500 p-4 rounded-lg shadow-md w-full md:w-1/6 text-center">
+                    <h3 class="font-bold text-slate-800">Step 1</h3>
+                    <p class="text-sm text-slate-600">Rack & Cable Hardware</p>
+                </div>
+                <div class="flow-arrow transform md:rotate-0 rotate-90">&rarr;</div>
+                <div class="bg-white border-l-4 border-blue-500 p-4 rounded-lg shadow-md w-full md:w-1/6 text-center">
+                    <h3 class="font-bold text-slate-800">Step 2</h3>
+                    <p class="text-sm text-slate-600">Initial Power-On</p>
+                </div>
+                <div class="flow-arrow transform md:rotate-0 rotate-90">&rarr;</div>
+                <div class="bg-white border-l-4 border-blue-500 p-4 rounded-lg shadow-md w-full md:w-1/6 text-center">
+                    <h3 class="font-bold text-slate-800">Step 3</h3>
+                    <p class="text-sm text-slate-600">Run Guided Setup</p>
+                </div>
+                <div class="flow-arrow transform md:rotate-0 rotate-90">&rarr;</div>
+                <div class="bg-white border-l-4 border-blue-500 p-4 rounded-lg shadow-md w-full md:w-1/6 text-center">
+                    <h3 class="font-bold text-slate-800">Step 4</h3>
+                    <p class="text-sm text-slate-600">Create Aggregates & SVMs</p>
+                </div>
+                <div class="flow-arrow transform md:rotate-0 rotate-90">&rarr;</div>
+                <div class="bg-white border-l-4 border-blue-500 p-4 rounded-lg shadow-md w-full md:w-1/6 text-center">
+                    <h3 class="font-bold text-slate-800">Step 5</h3>
+                    <p class="text-sm text-slate-600">Provision Storage</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="troubleshooting" class="content-section">
+            <div class="text-center mb-8">
+                <h2 class="text-3xl font-bold text-slate-900 mb-2">Common Issues & Troubleshooting</h2>
+                <p class="text-lg text-slate-600 max-w-3xl mx-auto">A guide to identifying and resolving common errors. Use the search box to filter issues or browse the categories below.</p>
+            </div>
+            
+            <div class="bg-white p-6 rounded-lg shadow mb-8">
+                 <h3 class="text-xl font-bold text-slate-800 mb-4 text-center">Troubleshooting Flow: NFS Mount Failure</h3>
+                 <div class="flex flex-col items-center text-center">
+                    <div class="bg-slate-100 p-3 rounded-lg shadow-inner w-full md:w-1/2">
+                        <p class="font-semibold">Symptom: Client cannot mount NFS export.</p>
+                    </div>
+                    <div class="flow-arrow rotate-90">&darr;</div>
+                    <div class="bg-yellow-100 border border-yellow-300 p-3 rounded-lg w-full md:w-1/2">
+                        <p class="font-semibold">Check: Can client ping the storage LIF IP?</p>
+                    </div>
+                    <div class="w-full flex justify-center gap-4 my-2">
+                        <div class="flex-1 text-right mr-2"><span class="text-red-500 font-bold">NO &rarr;</span></div>
+                        <div class="flex-1 text-left ml-2"><span class="text-green-500 font-bold">&larr; YES</span></div>
+                    </div>
+                    <div class="w-full flex justify-center gap-4">
+                        <div class="bg-red-50 p-3 rounded-lg w-1/2 md:w-1/3">
+                            <p>Investigate network path: firewalls, routing, physical layer issues.</p>
+                        </div>
+                        <div class="bg-yellow-100 border border-yellow-300 p-3 rounded-lg w-1/2 md:w-1/3">
+                            <p class="font-semibold">Check: Is client IP in the export policy?</p>
+                        </div>
+                    </div>
+                     <div class="flow-arrow rotate-90 self-end mr-[25%]">&darr;</div>
+                     <div class="w-full flex justify-end">
+                         <div class="bg-green-50 p-3 rounded-lg w-1/2 md:w-1/3 text-center">
+                            <p>Correct the export policy to include client IP/subnet.</p>
+                        </div>
+                     </div>
+                 </div>
+            </div>
+
+            <div class="mb-6">
+                <input type="text" id="error-search" placeholder="&#128269; Search for errors (e.g., disk, network)..." class="w-full p-3 border border-slate-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+            </div>
+             <div class="space-y-4" id="troubleshooting-accordion">
+            </div>
+        </section>
+        
+    </main>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            
+            const navLinks = document.querySelectorAll('.nav-link');
+            const mobileNav = document.getElementById('mobile-nav');
+            const sections = document.querySelectorAll('.content-section');
+
+            function switchTab(targetId) {
+                navLinks.forEach(link => {
+                    link.classList.toggle('active', link.dataset.target === targetId);
+                });
+                sections.forEach(section => {
+                    section.classList.toggle('active', section.id === targetId);
+                });
+                if (mobileNav.value !== targetId) {
+                    mobileNav.value = targetId;
+                }
+            }
+            
+            navLinks.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    switchTab(e.target.dataset.target);
+                });
+            });
+
+            mobileNav.addEventListener('change', (e) => {
+                switchTab(e.target.value);
+            });
+
+            const protocolData = {
+                labels: ['NFS (NAS)', 'SMB/CIFS (NAS)', 'iSCSI (SAN)', 'Fibre Channel (SAN)'],
+                datasets: [{
+                    label: 'Protocol Usage',
+                    data: [40, 30, 20, 10],
+                    backgroundColor: ['#3b82f6', '#60a5fa', '#93c5fd', '#bfdbfe'],
+                    borderColor: '#f8fafc',
+                    borderWidth: 4,
+                    hoverOffset: 8
+                }]
+            };
+            const protocolCtx = document.getElementById('protocolChart').getContext('2d');
+            new Chart(protocolCtx, {
+                type: 'doughnut',
+                data: protocolData,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                padding: 20,
+                                font: {
+                                    size: 14
+                                }
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.parsed !== null) {
+                                        label += context.parsed + '%';
+                                    }
+                                    return label;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            const hardwareData = {
+                controller: {
+                    title: 'Controller Chassis (4U)',
+                    description: 'The "brain" of the system, housed in a 4U rack-mountable chassis. It contains dual active-active controllers for high availability, each with its own CPU, memory, and expansion slots.',
+                    specs: [
+                        'Form Factor: 4U rack-mountable',
+                        'Controllers: Dual (active-active)',
+                        'PCIe Expansion Slots: 10 per controller',
+                        'NVRAM: PCIe-based for write caching and logging'
+                    ]
+                },
+                'io-modules': {
+                    title: 'Connectivity Ports (per HA Pair)',
+                    description: 'The total maximum port counts for a standard High-Availability pair, which can be used for client data access, cluster interconnects, and storage expansion.',
+                    specs: [
+                        '100GbE Ports: 16',
+                        '25GbE Ports: 32',
+                        '10GbE Ports: 16',
+                        '10GBASE-T Ports: 16',
+                        '32Gb Fibre Channel Ports: 24',
+                        '16Gb Fibre Channel Ports: 32',
+                        '12Gb SAS Ports: 32'
+                    ]
+                },
+                psu: {
+                    title: 'Power & Capacity (per HA Pair)',
+                    description: 'Key specifications related to the system\'s power draw and maximum storage capacity.',
+                    specs: [
+                        'Max Drives: 720',
+                        'Max Raw Capacity: 14.7PB',
+                        'Median Power Consumption: 681W (base)',
+                        'Median Power Consumption: 846W (with DS224C shelf)'
+                    ]
+                },
+                shelves: {
+                    title: 'Supported Disk Shelves',
+                    description: 'External enclosures that hold the physical drives (SSD, SAS, SATA). They connect to the controller chassis via high-speed SAS cables and allow for scaling storage capacity.',
+                    specs: [
+                        'DS212C: 2U, 12 LFF drives',
+                        'DS224C: 2U, 24 SFF drives',
+                        'DS460C: 4U, 60 LFF drives'
+                    ]
+                }
+            };
+            const hardwareTabs = document.querySelectorAll('#hardware-tabs .tab-button');
+            const hardwareContent = document.getElementById('hardware-content');
+            
+            function updateHardwareContent(targetId) {
+                const data = hardwareData[targetId];
+                if (!data) return;
+                hardwareContent.innerHTML = `
+                    <h3 class="text-2xl font-bold text-slate-800 mb-4">${data.title}</h3>
+                    <p class="text-slate-600 mb-6">${data.description}</p>
+                    <h4 class="font-semibold text-lg text-slate-700 mb-3">Key Specifications:</h4>
+                    <ul class="space-y-2 list-disc list-inside text-slate-600">
+                        ${data.specs.map(spec => `<li>${spec}</li>`).join('')}
+                    </ul>
+                `;
+            }
+            
+            hardwareTabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    hardwareTabs.forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                    updateHardwareContent(tab.dataset.target);
+                });
+            });
+            updateHardwareContent('controller');
+
+            const softwareFeatureSelect = document.getElementById('software-feature-select');
+            const softwareDiagramContainer = document.getElementById('software-diagram-container');
+
+            const softwareDiagrams = {
+                snapshots: `
+                    <div class="w-full">
+                        <h3 class="text-xl font-bold text-slate-800 mb-4 text-center">Snapshot Technology</h3>
+                        <div class="flex flex-col items-center text-center">
+                            <div class="p-4 bg-blue-500 text-white rounded-lg shadow-md w-1/2">Production Volume</div>
+                            <div class="flex justify-around w-full mt-8">
+                                <div class="flex flex-col items-center"><div class="w-px h-8 bg-slate-400"></div><div class="p-2 bg-blue-100 text-blue-800 rounded-lg shadow w-32 md:w-48">Snapshot (8 AM)</div></div>
+                                <div class="flex flex-col items-center"><div class="w-px h-8 bg-slate-400"></div><div class="p-2 bg-blue-100 text-blue-800 rounded-lg shadow w-32 md:w-48">Snapshot (12 PM)</div></div>
+                                <div class="flex flex-col items-center"><div class="w-px h-8 bg-slate-400"></div><div class="p-2 bg-blue-100 text-blue-800 rounded-lg shadow w-32 md:w-48">Snapshot (4 PM)</div></div>
+                            </div>
+                            <p class="mt-6 text-slate-600 max-w-2xl">Creates instantaneous, point-in-time copies of data with minimal performance impact. Pointers are created to the original data blocks, consuming space only when the original data changes.</p>
+                        </div>
+                    </div>`,
+                flexclone: `
+                    <div class="w-full">
+                        <h3 class="text-xl font-bold text-slate-800 mb-4 text-center">FlexClone Technology</h3>
+                        <div class="flex flex-col items-center text-center">
+                            <div class="p-3 bg-blue-100 text-blue-800 rounded-lg shadow w-1/2">Snapshot (Base)</div>
+                            <div class="flow-arrow rotate-90">&darr;</div>
+                            <div class="p-4 bg-purple-500 text-white rounded-lg shadow-md w-1/2">New Writable Clone Volume</div>
+                            <p class="mt-6 text-slate-600 max-w-2xl">Instantly create writable, space-efficient virtual copies of volumes or LUNs from a Snapshot. Ideal for dev/test environments, analytics, and DR testing without consuming significant extra space.</p>
+                        </div>
+                    </div>`,
+                snapmirror: `
+                    <div class="w-full">
+                        <h3 class="text-xl font-bold text-slate-800 mb-4 text-center">SnapMirror Replication</h3>
+                        <div class="flex items-center justify-center gap-4 text-center">
+                            <div class="p-4 bg-green-100 border border-green-300 rounded-lg shadow w-1/3"><h4>Source System</h4><p class="text-sm">(Production)</p></div>
+                            <div class="flex flex-col items-center">
+                                <div class="font-mono text-slate-500 text-sm">Replication</div>
+                                <div class="flow-arrow">&rarr;</div>
+                            </div>
+                            <div class="p-4 bg-orange-100 border border-orange-300 rounded-lg shadow w-1/3"><h4>Destination System</h4><p class="text-sm">(Disaster Recovery)</p></div>
+                        </div>
+                        <p class="mt-6 text-slate-600 max-w-2xl mx-auto text-center">Asynchronous and synchronous data replication for disaster recovery. Efficiently mirrors data between NetApp systems, on-premises or in the cloud.</p>
+                    </div>`,
+                efficiency: `
+                    <div class="w-full">
+                        <h3 class="text-xl font-bold text-slate-800 mb-4 text-center">Storage Efficiency</h3>
+                        <div class="flex flex-col md:flex-row items-center justify-center gap-2 text-center">
+                            <div class="p-3 bg-slate-200 rounded-lg">Original Data</div>
+                            <div class="flow-arrow transform md:rotate-0 rotate-90">&rarr;</div>
+                            <div class="p-3 bg-indigo-100 rounded-lg">Deduplication</div>
+                            <div class="flow-arrow transform md:rotate-0 rotate-90">&rarr;</div>
+                            <div class="p-3 bg-teal-100 rounded-lg">Compression</div>
+                            <div class="flow-arrow transform md:rotate-0 rotate-90">&rarr;</div>
+                            <div class="p-3 bg-lime-100 rounded-lg">Compaction</div>
+                            <div class="flow-arrow transform md:rotate-0 rotate-90">&rarr;</div>
+                            <div class="p-3 bg-green-200 rounded-lg">Reduced Footprint</div>
+                        </div>
+                        <p class="mt-6 text-slate-600 max-w-2xl mx-auto text-center">A suite of features including deduplication, compression, and compaction that work together to reduce the physical storage footprint and lower TCO.</p>
+                    </div>`,
+                fabricpool: `
+                     <div class="w-full">
+                        <h3 class="text-xl font-bold text-slate-800 mb-4 text-center">FabricPool Tiering</h3>
+                        <div class="flex items-center justify-center gap-4 text-center">
+                            <div class="p-4 bg-sky-200 border border-sky-400 rounded-lg shadow w-1/3"><h4>Performance Tier</h4><p class="text-sm">(Local SSDs)</p></div>
+                            <div class="flex flex-col items-center">
+                                <div class="font-mono text-slate-500 text-sm">Auto-Tiering of Cold Data</div>
+                                <div class="flow-arrow">&rarr;</div>
+                            </div>
+                            <div class="p-4 bg-slate-200 border border-slate-400 rounded-lg shadow w-1/3"><h4>Capacity Tier</h4><p class="text-sm">(Cloud Object Store)</p></div>
+                        </div>
+                        <p class="mt-6 text-slate-600 max-w-2xl mx-auto text-center">Automated tiering of inactive "cold" data from high-performance SSDs to lower-cost object storage, optimizing performance and cost.</p>
+                    </div>`
+            };
+            
+            function updateSoftwareDiagram(feature) {
+                if (softwareDiagrams[feature]) {
+                    softwareDiagramContainer.innerHTML = softwareDiagrams[feature];
+                }
+            }
+
+            softwareFeatureSelect.addEventListener('change', (e) => {
+                updateSoftwareDiagram(e.target.value);
+            });
+            updateSoftwareDiagram('snapshots');
+
+            const troubleshootingData = [
+                { category: 'Disk and Aggregate Issues', error: 'Disk Failure (status "failed")', cause: 'Physical disk has failed and needs replacement.', solution: 'Use ONTAP commands or System Manager to identify the failed disk. Follow hot-swap procedure to replace it. The system will automatically start rebuilding data onto the new disk.' },
+                { category: 'Disk and Aggregate Issues', error: 'Aggregate in degraded mode', cause: 'One or more disks in the aggregate have failed, but RAID redundancy is preventing data loss.', solution: 'Identify and replace the failed disk(s) immediately to restore full redundancy.' },
+                { category: 'Network Connectivity', error: 'Cannot ping management LIF', cause: 'Incorrect IP configuration, gateway issue, VLAN misconfiguration, or physical network problem.', solution: 'Verify IP/netmask/gateway settings using `net int show`. Check physical cable connections. Work with your network team to validate VLAN tagging and switch port configuration.' },
+                { category: 'Network Connectivity', error: 'Client cannot mount NFS export', cause: 'Export policy does not include the client\'s IP, or a firewall is blocking the connection.', solution: 'Use `vserver export-policy rule show` to verify rules. Ensure the client IP or subnet is listed with correct permissions. Check for firewalls between the client and storage.' },
+                { category: 'Performance', error: 'High CPU utilization', cause: 'Heavy workload, inefficient client application, or a system process like deduplication running at peak hours.', solution: 'Use `sysstat -x 1` to identify the source of the load. Consider rescheduling background jobs (scrub, dedupe) to off-peak hours. Analyze client workload for inefficiencies.' },
+                { category: 'Performance', error: 'High disk latency', cause: 'A few disks are overworked (hotspot), insufficient cache, or hardware issue.', solution: 'Use `qos statistics volume latency show` to identify high-latency volumes. Consider adding more disks to the aggregate or using Flash Pool/FabricPool to tier data.' }
+            ];
+            const troubleshootingAccordion = document.getElementById('troubleshooting-accordion');
+            const errorSearch = document.getElementById('error-search');
+
+            function renderTroubleshooting(filter = '') {
+                const filteredData = troubleshootingData.filter(item => 
+                    item.category.toLowerCase().includes(filter) || 
+                    item.error.toLowerCase().includes(filter) || 
+                    item.solution.toLowerCase().includes(filter)
+                );
+
+                if (filteredData.length === 0) {
+                    troubleshootingAccordion.innerHTML = `<div class="text-center p-6 bg-white rounded-lg shadow-sm text-slate-500">No matching issues found.</div>`;
+                    return;
+                }
+
+                troubleshootingAccordion.innerHTML = filteredData.map((item, index) => `
+                    <div class="trouble-item bg-white rounded-lg shadow-sm">
+                        <button class="accordion-header w-full flex justify-between items-center p-4 text-left">
+                            <span class="font-semibold text-slate-700">${item.error}</span>
+                             <span class="transform transition-transform duration-300">&#9662;</span>
+                        </button>
+                        <div class="accordion-content px-4 pb-4">
+                            <p class="text-slate-600 mb-2"><strong>Category:</strong> ${item.category}</p>
+                            <p class="text-slate-600 mb-2"><strong>Potential Cause:</strong> ${item.cause}</p>
+                            <p class="text-slate-600"><strong>Solution:</strong> ${item.solution}</p>
+                        </div>
+                    </div>
+                `).join('');
+                addAccordionListeners();
+            }
+
+            errorSearch.addEventListener('input', (e) => {
+                renderTroubleshooting(e.target.value.toLowerCase());
+            });
+
+            function addAccordionListeners() {
+                const accordionHeaders = document.querySelectorAll('.accordion-header');
+                accordionHeaders.forEach(header => {
+                    header.addEventListener('click', () => {
+                        const content = header.nextElementSibling;
+                        const icon = header.querySelector('span:last-child');
+                        
+                        const isOpening = !content.style.maxHeight;
+
+                        // Close all other accordions in the same container
+                        header.closest('.space-y-2, .space-y-4').querySelectorAll('.accordion-content').forEach(otherContent => {
+                            if (otherContent !== content && otherContent.style.maxHeight) {
+                                otherContent.style.maxHeight = null;
+                                otherContent.previousElementSibling.querySelector('span:last-child').style.transform = 'rotate(0deg)';
+                            }
+                        });
+
+                        if (isOpening) {
+                            content.style.maxHeight = content.scrollHeight + 'px';
+                            icon.style.transform = 'rotate(180deg)';
+                        } else {
+                            content.style.maxHeight = null;
+                            icon.style.transform = 'rotate(0deg)';
+                        }
+                    });
+                });
+            }
+            
+            // Initial render and listener attachment
+            renderTroubleshooting();
+            // Attach listeners to all accordions
+            addAccordionListeners();
+
+        });
+    </script>
+</body>
+</html>
